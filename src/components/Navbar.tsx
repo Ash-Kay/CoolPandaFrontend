@@ -2,33 +2,14 @@ import Typography from "@mui/material/Typography";
 import Link from "next/link";
 import Box from "@mui/material/Box";
 import { Button } from "@mui/material";
-import useWeb3Store from "../state/web3.store";
-import { useEffect, useState } from "react";
-import useGlobalStore from "../state/global.store";
+import { useWeb3Context } from "../context";
 
 interface Props {
   onConnectWalletClicked: () => void;
 }
 
-const useHasHydrated = () => {
-  const [hasHydrated, setHasHydrated] = useState<boolean>(false);
-
-  useEffect(() => {
-    setHasHydrated(true);
-  }, []);
-
-  return hasHydrated;
-};
-
 const Navbar: React.FC<Props> = (props: Props) => {
-  const hasHydrated = useHasHydrated();
-  const web3State = useWeb3Store((state) => state.data);
-  const isWallectConnected = useGlobalStore(
-    (state) => state.isWallectConnected
-  );
-  useEffect(() => {
-    console.log("nav state", web3State, hasHydrated, isWallectConnected);
-  }, [hasHydrated]);
+  const { address } = useWeb3Context();
 
   return (
     <Box
@@ -59,21 +40,15 @@ const Navbar: React.FC<Props> = (props: Props) => {
           </Typography>
         </Link>
 
-        {hasHydrated && (
-          <Box>
-            {!isWallectConnected && (
-              <Button
-                variant="contained"
-                onClick={props.onConnectWalletClicked}
-              >
-                Connect Wallet
-              </Button>
-            )}
-            {isWallectConnected && web3State.address && (
-              <h1>{web3State.address}</h1>
-            )}
-          </Box>
-        )}
+        <Box>
+          {address ? (
+            <h1>{address}</h1>
+          ) : (
+            <Button variant="contained" onClick={props.onConnectWalletClicked}>
+              Connect Wallet
+            </Button>
+          )}
+        </Box>
       </Box>
     </Box>
   );

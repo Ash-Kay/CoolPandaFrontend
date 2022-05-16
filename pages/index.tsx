@@ -8,136 +8,10 @@ import Web3Modal from "web3modal";
 import { useCallback, useEffect, useState } from "react";
 import useWeb3Store from "../src/state/web3.store";
 import useGlobalStore from "../src/state/global.store";
-
-const providerOptions = {
-  /* See Provider Options Section */
-};
+import { useWeb3Context } from "../src/context";
 
 const Home: NextPage = () => {
-  const web3Store = useWeb3Store();
-  const isWallectConnected = useGlobalStore(
-    (state) => state.isWallectConnected
-  );
-  const updateWalletConnectionState = useGlobalStore(
-    (state) => state.updateWalletState
-  );
-  const [web3Modal, setWeb3Modal] = useState<Web3Modal | null>(null);
-  const [web3ModalInstance, setWeb3ModalInstance] = useState<any | null>(null);
-
-  const connectWallet = useCallback(async () => {
-    if (typeof window !== "undefined" && web3Modal != null) {
-      try {
-        const instance = await web3Modal.connect();
-        setWeb3ModalInstance(instance);
-
-        const provider = new ethers.providers.Web3Provider(instance);
-        const signer = provider.getSigner();
-        const address = await signer.getAddress();
-        const network = await provider.getNetwork();
-
-        console.log("address", address);
-
-        updateWalletConnectionState(true);
-        web3Store.updateState({
-          provider,
-          signer,
-          address,
-          network,
-        });
-        console.log("CONNECTR#ED, updated state");
-      } catch (e) {
-        console.log(e);
-      }
-    } else {
-      console.log("window !== undefined");
-      web3Store.clear();
-    }
-  }, [web3Modal, web3Store]);
-
-  const disconnectWallet = useCallback(async () => {
-    if (web3Modal && web3ModalInstance) {
-      await web3Modal.clearCachedProvider();
-      if (
-        web3ModalInstance?.disconnect &&
-        typeof web3ModalInstance.disconnect === "function"
-      ) {
-        await web3ModalInstance.disconnect();
-      }
-      web3Store.clear();
-      updateWalletConnectionState(false);
-      console.log("DISCONNECTED!!!");
-    }
-  }, [web3Modal, web3ModalInstance, isWallectConnected]);
-
-  useEffect(() => {
-    if (typeof window !== "undefined" && web3Modal == null) {
-      setWeb3Modal(
-        new Web3Modal({
-          network: "mainnet",
-          cacheProvider: true,
-          providerOptions,
-        })
-      );
-    }
-
-    if (!web3Store.data.address || !web3Store.data.provider) {
-      console.log("disconnect");
-      disconnectWallet();
-    }
-
-    if (
-      isWallectConnected &&
-      (web3Store.data.address || web3Store.data.provider)
-    ) {
-      connectWallet();
-    }
-
-    console.log("useEffect1: web3Modal connected []");
-  }, [web3Modal, isWallectConnected]);
-
-  useEffect(() => {
-    if (web3ModalInstance?.on) {
-      const handleAccountsChanged = (accounts: string[]) => {
-        console.log("accountsChanged", accounts);
-        if (accounts.length >= 1) {
-          web3Store.updateState({ address: accounts[0] });
-        } else {
-          disconnectWallet();
-        }
-      };
-
-      // https://docs.ethers.io/v5/concepts/best-practices/#best-practices--network-changes
-      const handleChainChanged = (_hexChainId: string) => {
-        window.location.reload();
-      };
-
-      const handleDisconnect = (error: { code: number; message: string }) => {
-        console.log("disconnect", error);
-        disconnectWallet();
-      };
-
-      web3ModalInstance.on("accountsChanged", handleAccountsChanged);
-      web3ModalInstance.on("chainChanged", handleChainChanged);
-      web3ModalInstance.on("disconnect", handleDisconnect);
-
-      // Subscription Cleanup
-      return () => {
-        if (web3ModalInstance.removeListener) {
-          web3ModalInstance.removeListener(
-            "accountsChanged",
-            handleAccountsChanged
-          );
-          web3ModalInstance.removeListener("chainChanged", handleChainChanged);
-          web3ModalInstance.removeListener("disconnect", handleDisconnect);
-        }
-      };
-    }
-
-    console.log(
-      "useEffect2: web3ModalInstance callback [web3ModalInstance, disconnectWallet]"
-    );
-  }, [web3ModalInstance, disconnectWallet]);
-
+  const { web3Provider, connect, disconnect } = useWeb3Context();
   return (
     <div className={styles.container}>
       <Head>
@@ -146,7 +20,11 @@ const Home: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <Navbar onConnectWalletClicked={connectWallet} />
+      <Navbar
+        onConnectWalletClicked={() => {
+          connect?.();
+        }}
+      />
 
       <Box sx={{ marginTop: "60px" }} component="main">
         <Button variant="contained">Hi</Button>
