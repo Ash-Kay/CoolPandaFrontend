@@ -3,17 +3,32 @@ import Link from "next/link";
 import Box from "@mui/material/Box";
 import { Button } from "@mui/material";
 import useWeb3Store from "../state/web3.store";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import useGlobalStore from "../state/global.store";
 
 interface Props {
   onConnectWalletClicked: () => void;
 }
 
-const Navbar: React.FC<Props> = (props: Props) => {
-  const web3State = useWeb3Store((state) => state.data);
+const useHasHydrated = () => {
+  const [hasHydrated, setHasHydrated] = useState<boolean>(false);
+
   useEffect(() => {
-    console.log("nav state", web3State);
-  }, [web3State]);
+    setHasHydrated(true);
+  }, []);
+
+  return hasHydrated;
+};
+
+const Navbar: React.FC<Props> = (props: Props) => {
+  const hasHydrated = useHasHydrated();
+  const web3State = useWeb3Store((state) => state.data);
+  const isWallectConnected = useGlobalStore(
+    (state) => state.isWallectConnected
+  );
+  useEffect(() => {
+    console.log("nav state", web3State, hasHydrated, isWallectConnected);
+  }, [hasHydrated]);
 
   return (
     <Box
@@ -44,16 +59,21 @@ const Navbar: React.FC<Props> = (props: Props) => {
           </Typography>
         </Link>
 
-        <Box>
-          {/* {!web3State.isWallectConnected && ( */}
-          <Button variant="contained" onClick={props.onConnectWalletClicked}>
-            Connect Wallet
-          </Button>
-          {/* )} */}
-          {web3State.isWallectConnected && web3State.address && (
-            <h1>{web3State.address}</h1>
-          )}
-        </Box>
+        {hasHydrated && (
+          <Box>
+            {!isWallectConnected && (
+              <Button
+                variant="contained"
+                onClick={props.onConnectWalletClicked}
+              >
+                Connect Wallet
+              </Button>
+            )}
+            {isWallectConnected && web3State.address && (
+              <h1>{web3State.address}</h1>
+            )}
+          </Box>
+        )}
       </Box>
     </Box>
   );

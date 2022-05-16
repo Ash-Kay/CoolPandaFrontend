@@ -1,23 +1,28 @@
 import { Box, Button } from "@mui/material";
 import type { NextPage } from "next";
 import Head from "next/head";
-import Image from "next/image";
 import Navbar from "../src/components/Navbar";
 import styles from "../styles/Home.module.css";
 import { ethers } from "ethers";
 import Web3Modal from "web3modal";
 import { useCallback, useEffect, useState } from "react";
 import useWeb3Store from "../src/state/web3.store";
+import useGlobalStore from "../src/state/global.store";
 
 const providerOptions = {
   /* See Provider Options Section */
 };
 
 const Home: NextPage = () => {
-  const web3Store = useWeb3Store((state) => state);
+  const web3Store = useWeb3Store();
+  const isWallectConnected = useGlobalStore(
+    (state) => state.isWallectConnected
+  );
+  const updateWalletConnectionState = useGlobalStore(
+    (state) => state.updateWalletState
+  );
   const [web3Modal, setWeb3Modal] = useState<Web3Modal | null>(null);
   const [web3ModalInstance, setWeb3ModalInstance] = useState<any | null>(null);
-  const web3state1 = useWeb3Store((state) => state.data);
 
   const connectWallet = useCallback(async () => {
     if (typeof window !== "undefined" && web3Modal != null) {
@@ -29,17 +34,22 @@ const Home: NextPage = () => {
         const signer = provider.getSigner();
         const address = await signer.getAddress();
         const network = await provider.getNetwork();
+
+        console.log("address", address);
+
+        updateWalletConnectionState(true);
         web3Store.updateState({
-          isWallectConnected: true,
           provider,
           signer,
           address,
           network,
         });
+        console.log("CONNECTR#ED, updated state");
       } catch (e) {
         console.log(e);
       }
     } else {
+      console.log("window !== undefined");
       web3Store.clear();
     }
   }, [web3Modal, web3Store]);
@@ -54,8 +64,10 @@ const Home: NextPage = () => {
         await web3ModalInstance.disconnect();
       }
       web3Store.clear();
+      updateWalletConnectionState(false);
+      console.log("DISCONNECTED!!!");
     }
-  }, [web3Modal, web3ModalInstance]);
+  }, [web3Modal, web3ModalInstance, isWallectConnected]);
 
   useEffect(() => {
     if (typeof window !== "undefined" && web3Modal == null) {
@@ -68,14 +80,20 @@ const Home: NextPage = () => {
       );
     }
 
-    if (web3state1.isWallectConnected) {
-      console.log("WAllet connected  already!!!");
-    } else {
-      console.log("WAllet nNOOTT  conn!!!");
+    if (!web3Store.data.address || !web3Store.data.provider) {
+      console.log("disconnect");
+      disconnectWallet();
+    }
+
+    if (
+      isWallectConnected &&
+      (web3Store.data.address || web3Store.data.provider)
+    ) {
+      connectWallet();
     }
 
     console.log("useEffect1: web3Modal connected []");
-  }, []);
+  }, [web3Modal, isWallectConnected]);
 
   useEffect(() => {
     if (web3ModalInstance?.on) {

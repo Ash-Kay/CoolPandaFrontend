@@ -8,7 +8,6 @@ export interface Web3State {
 }
 
 interface Web3StateData {
-  isWallectConnected: boolean;
   provider: ethers.providers.Web3Provider | null;
   signer: ethers.providers.JsonRpcSigner | null;
   address: string | null;
@@ -16,7 +15,6 @@ interface Web3StateData {
 }
 
 const WEB3_INITIAL_STATE: Web3StateData = {
-  isWallectConnected: false,
   provider: null,
   signer: null,
   address: null,
@@ -30,12 +28,6 @@ const store = (set: SetState<Web3State>, get: GetState<Web3State>) => ({
   clear: () => set(() => ({ data: WEB3_INITIAL_STATE })),
 });
 
-const useWeb3Store = create(
-  persist(devtools(store), {
-    name: "web3StateData",
-    getStorage: () => localStorage,
-    version: 1,
-  })
-);
+const useWeb3Store = create(devtools(store));
 
 export default useWeb3Store;
