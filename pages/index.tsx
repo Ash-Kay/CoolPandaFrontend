@@ -3,15 +3,78 @@ import type { NextPage } from "next";
 import Head from "next/head";
 import Navbar from "../src/components/Navbar";
 import styles from "../styles/Home.module.css";
-import { ethers } from "ethers";
-import Web3Modal from "web3modal";
-import { useCallback, useEffect, useState } from "react";
-import useWeb3Store from "../src/state/web3.store";
-import useGlobalStore from "../src/state/global.store";
 import { useWeb3Context } from "../src/context";
+import { getMarketStorageContract } from "../src/hooks/MarketStorageContract";
+import { useCallback, useEffect, useState } from "react";
 
 const Home: NextPage = () => {
+  interface Market {
+    marketId: number;
+    question: string;
+    description: string;
+    marketType: number;
+    options: string[];
+    resolverUrl: string;
+    creatorImageHash: string;
+    endTimestamp: number;
+  }
+
   const { web3Provider, connect, disconnect } = useWeb3Context();
+  const [markets, setMarkets] = useState<Market[]>([]);
+
+  const getMarkets = useCallback(async () => {
+    if (web3Provider) {
+      const contract = getMarketStorageContract(web3Provider);
+
+      const totalMarkets = await contract.getTotalMarkets();
+      const list: Market[] = [];
+
+      console.log("totalMarkets", totalMarkets);
+
+      for (let i = 1; i <= totalMarkets; i++) {
+        const market = await contract.markets(i);
+        list.push(market);
+      }
+      setMarkets(list);
+    } else {
+      console.log("web3 provider is null!");
+    }
+  }, [web3Provider]);
+
+  const createMarket = async () => {
+    if (web3Provider) {
+      const marketHolder = {
+        marketId: 1,
+        question: "WAGMI?",
+        description: "No one knows",
+        marketType: 0,
+        options: ["yes", "no"],
+        resolverUrl: "https://ashishkumars.com/coolpanda/resolve/1",
+        creatorImageHash: "https://ashishkumars.com/coolpanda/1/img.jpg",
+        endTimestamp: Date.now() + 1000,
+      };
+
+      const contract = getMarketStorageContract(web3Provider);
+
+      const createMarketTx = await contract.createMarket(
+        marketHolder.marketId,
+        marketHolder.question,
+        marketHolder.description,
+        marketHolder.marketType,
+        marketHolder.options,
+        marketHolder.resolverUrl,
+        marketHolder.creatorImageHash,
+        marketHolder.endTimestamp
+      );
+
+      console.log("createMarketTx", createMarketTx);
+    }
+  };
+
+  useEffect(() => {
+    getMarkets();
+  }, [getMarkets]);
+
   return (
     <div className={styles.container}>
       <Head>
@@ -27,7 +90,22 @@ const Home: NextPage = () => {
       />
 
       <Box sx={{ marginTop: "60px" }} component="main">
-        <Button variant="contained">Hi</Button>
+        <Button variant="contained" onClick={getMarkets}>
+          Get Markets
+        </Button>
+
+        <Button variant="contained" onClick={createMarket}>
+          Crate market
+        </Button>
+      </Box>
+
+      <Box>
+        {markets.map((market: Market, index) => (
+          <Box key={index}>
+            <h5>{market.question}</h5>
+            <p>{market.description}</p>
+          </Box>
+        ))}
       </Box>
 
       <footer>

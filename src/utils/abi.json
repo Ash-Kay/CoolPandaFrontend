@@ -1,0 +1,393 @@
+{
+  "abi": [
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "previousOwner",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "newOwner",
+          "type": "address"
+        }
+      ],
+      "name": "OwnershipTransferred",
+      "type": "event"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_marketId",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint128",
+          "name": "_optionSelected",
+          "type": "uint128"
+        }
+      ],
+      "name": "addBet",
+      "outputs": [],
+      "stateMutability": "payable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        },
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "name": "bidders",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "bidderAddress",
+          "type": "address"
+        },
+        {
+          "internalType": "uint128",
+          "name": "optionSelected",
+          "type": "uint128"
+        },
+        {
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint128",
+          "name": "",
+          "type": "uint128"
+        },
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "name": "biddersAddressByOption",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint128",
+          "name": "",
+          "type": "uint128"
+        }
+      ],
+      "name": "biddersTotalBalanceByOption",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_marketId",
+          "type": "uint256"
+        },
+        {
+          "internalType": "string",
+          "name": "_question",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "_description",
+          "type": "string"
+        },
+        {
+          "internalType": "enum MarketStorage.MarketType",
+          "name": "_marketType",
+          "type": "uint8"
+        },
+        {
+          "internalType": "string[]",
+          "name": "_options",
+          "type": "string[]"
+        },
+        {
+          "internalType": "string",
+          "name": "_resolverUrl",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "_creatorImageHash",
+          "type": "string"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_endTimestamp",
+          "type": "uint256"
+        }
+      ],
+      "name": "createMarket",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "marketId",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_marketId",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint128",
+          "name": "outcomeOption",
+          "type": "uint128"
+        }
+      ],
+      "name": "endMarket",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_marketId",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint128",
+          "name": "option",
+          "type": "uint128"
+        }
+      ],
+      "name": "getTotalBidderForOption",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "totalBidderForOption",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "getTotalMarkets",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "totalMarkets",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "name": "marketIds",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "name": "marketStates",
+      "outputs": [
+        {
+          "internalType": "enum MarketStorage.MarketState",
+          "name": "",
+          "type": "uint8"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "name": "markets",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "marketId",
+          "type": "uint256"
+        },
+        {
+          "internalType": "string",
+          "name": "question",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "description",
+          "type": "string"
+        },
+        {
+          "internalType": "enum MarketStorage.MarketType",
+          "name": "marketType",
+          "type": "uint8"
+        },
+        {
+          "internalType": "string",
+          "name": "resolverUrl",
+          "type": "string"
+        },
+        {
+          "internalType": "address",
+          "name": "createdBy",
+          "type": "address"
+        },
+        {
+          "internalType": "string",
+          "name": "creatorImageHash",
+          "type": "string"
+        },
+        {
+          "internalType": "uint256",
+          "name": "marketCreatedTimestamp",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "bidEndTimestamp",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "owner",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "redeemAmount",
+      "outputs": [],
+      "stateMutability": "payable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "name": "redeemableAmount",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "renounceOwnership",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "newOwner",
+          "type": "address"
+        }
+      ],
+      "name": "transferOwnership",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ]
+}
