@@ -6,19 +6,11 @@ import styles from "../styles/Home.module.css";
 import { useWeb3Context } from "../src/context";
 import { getMarketStorageContract } from "../src/hooks/MarketStorageContract";
 import { useCallback, useEffect, useState } from "react";
+import { Market } from "../src/interfaces";
+import MarketCard from "../src/components/MarketCard";
+import { ethers } from "ethers";
 
 const Home: NextPage = () => {
-  interface Market {
-    marketId: number;
-    question: string;
-    description: string;
-    marketType: number;
-    options: string[];
-    resolverUrl: string;
-    creatorImageHash: string;
-    endTimestamp: number;
-  }
-
   const { web3Provider, connect, disconnect } = useWeb3Context();
   const [markets, setMarkets] = useState<Market[]>([]);
 
@@ -33,7 +25,28 @@ const Home: NextPage = () => {
 
       for (let i = 1; i <= totalMarkets; i++) {
         const market = await contract.markets(i);
-        list.push(market);
+        // console.log("Market i:", market);
+
+        const newMarket: Market = {
+          marketId: parseInt(market.marketId, 8),
+          question: market.question,
+          description: market.description,
+          marketType: market.marketType,
+          options: [],
+          resolverUrl: market.resolverUrl,
+          creatorImageHash: market.creatorImageHash,
+          endTimestamp: market.endTimestamp,
+        };
+
+        const marketOption = await contract.getMarketOptions(i);
+
+        newMarket.options = marketOption;
+
+        // console.log("marketOption", marketOption);
+        // console.log(`market raw ${i}`, market);
+        // console.log(`market ${i}`, newMarket);
+
+        list.push(newMarket);
       }
       setMarkets(list);
     } else {
@@ -57,7 +70,6 @@ const Home: NextPage = () => {
       const contract = getMarketStorageContract(web3Provider);
 
       const createMarketTx = await contract.createMarket(
-        marketHolder.marketId,
         marketHolder.question,
         marketHolder.description,
         marketHolder.marketType,
@@ -72,8 +84,10 @@ const Home: NextPage = () => {
   };
 
   useEffect(() => {
-    getMarkets();
-  }, [getMarkets]);
+    if (web3Provider) {
+      getMarkets();
+    }
+  }, [getMarkets, web3Provider]);
 
   return (
     <div className={styles.container}>
@@ -99,12 +113,9 @@ const Home: NextPage = () => {
         </Button>
       </Box>
 
-      <Box>
+      <Box sx={{ maxWidth: "500px", margin: "0 auto" }}>
         {markets.map((market: Market, index) => (
-          <Box key={index}>
-            <h5>{market.question}</h5>
-            <p>{market.description}</p>
-          </Box>
+          <MarketCard market={market} key={index} />
         ))}
       </Box>
 

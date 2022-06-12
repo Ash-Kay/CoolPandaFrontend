@@ -30,7 +30,6 @@ const App = (props: MyAppProps) => {
             <Component {...pageProps} />
           </>
         </Web3ContextProvider>
-        )
       </ThemeProvider>
     </CacheProvider>
   );
