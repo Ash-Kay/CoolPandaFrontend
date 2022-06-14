@@ -68,7 +68,7 @@ export const useWeb3 = () => {
     if (web3Modal && web3Modal.cachedProvider) {
       connect();
     }
-  }, [connect]);
+  }, []);
 
   // EIP-1193 events
   useEffect(() => {

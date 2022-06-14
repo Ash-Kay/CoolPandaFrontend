@@ -1,8 +1,10 @@
 import Typography from "@mui/material/Typography";
 import Link from "next/link";
 import Box from "@mui/material/Box";
-import { Button } from "@mui/material";
+import { Button, Chip } from "@mui/material";
+import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet";
 import { useWeb3Context } from "../context";
+import { getMaskAddress } from "../utils/addressUtils";
 
 interface Props {
   onConnectWalletClicked: () => void;
@@ -42,7 +44,11 @@ const Navbar: React.FC<Props> = (props: Props) => {
 
         <Box>
           {address ? (
-            <h1>{address}</h1>
+            <Chip
+              icon={<AccountBalanceWalletIcon fontSize="small" />}
+              label={getMaskAddress(address)}
+              onClick={() => {}}
+            />
           ) : (
             <Button variant="contained" onClick={props.onConnectWalletClicked}>
               Connect Wallet

@@ -1,14 +1,11 @@
 import Typography from "@mui/material/Typography";
-import Link from "next/link";
 import Box from "@mui/material/Box";
 import {
   Button,
   Card,
   CardContent,
-  Collapse,
   LinearProgress,
   Modal,
-  TextField,
 } from "@mui/material";
 import { useWeb3Context } from "../context";
 import { Market } from "../interfaces";
@@ -28,30 +25,26 @@ const MarketCard: React.FC<Props> = (props: Props) => {
     option: 0,
   });
   const { web3Provider, connect, disconnect } = useWeb3Context();
-  const [amount, setAmount] = useState<Array<Number>>();
+  const [optionBalances, setOptionBalances] = useState<Array<Number>>([]);
 
   useEffect(() => {
     const getData = async () => {
-      if (web3Provider) {
-        const contract = getMarketStorageContract(web3Provider);
-        let arr: Array<Number> = [];
+      const provider = new ethers.providers.JsonRpcProvider();
+      const contract = getMarketStorageContract(provider);
 
-        console.log("forEach", props.market.marketId, props.market.options);
-
-        props.market.options.forEach(async (option, index) => {
-          const res = await contract.biddersTotalBalanceByOption(
+      const balanceList = await Promise.all(
+        props.market.options.map(async (option, index) => {
+          const hexBalance = await contract.biddersTotalBalanceByOption(
             props.market.marketId,
             index
           );
-          arr.push(parseFloat(ethers.utils.formatEther(res)));
-        });
-        setAmount(arr);
-      } else {
-        console.log("null in use effect market card");
-      }
+          return parseFloat(ethers.utils.formatEther(hexBalance));
+        })
+      );
+      setOptionBalances(balanceList);
     };
     getData();
-  }, [web3Provider]);
+  }, []);
 
   const handleOptionClicked = (index: number) => {
     if (web3Provider) {
@@ -93,10 +86,13 @@ const MarketCard: React.FC<Props> = (props: Props) => {
         </Typography>
         <Typography variant="body2">{props.market.description}</Typography>
 
-        {amount?.length > 1 && (
+        {optionBalances?.length > 1 && (
           <LinearProgress
             variant="determinate"
-            value={Math.floor((amount[0] / (amount[0] + amount[1])) * 100)}
+            value={Math.floor(
+              (optionBalances[0] / (optionBalances[0] + optionBalances[1])) *
+                100
+            )}
           />
         )}
         <Box
